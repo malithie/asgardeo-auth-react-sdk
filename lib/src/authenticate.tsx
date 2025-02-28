@@ -126,6 +126,8 @@ const AuthProvider: FunctionComponent<PropsWithChildren<AuthProviderPropsInterfa
     const isAuthenticated = () => AuthClient.isAuthenticated();
     const enableHttpHandler = () => AuthClient.enableHttpHandler();
     const disableHttpHandler = () => AuthClient.disableHttpHandler();
+    const getCryptoHelper = () => AuthClient.getCryptoHelper();
+    const getDataLayer = () => AuthClient.getDataLayer();
     const getIDToken = () => AuthClient.getIDToken();
     const updateConfig = (config: Partial<AuthClientConfig<AuthReactConfig>>) => AuthClient.updateConfig(config);
     const on = (hook: Hooks, callback: (response?: any) => void, id?: string): Promise<void> => {
@@ -310,7 +312,9 @@ const AuthProvider: FunctionComponent<PropsWithChildren<AuthProviderPropsInterfa
                     state,
                     trySignInSilently,
                     updateConfig,
-                    error
+                    error,
+                    getCryptoHelper,
+                    getDataLayer
                 } }
             >
                 { initialized ? children : fallback ?? null }

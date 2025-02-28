@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import { BasicUserInfo } from "@asgardeo/auth-react";
+import { BasicUserInfo, SessionData } from "@asgardeo/auth-react";
 import React, { FunctionComponent, ReactElement } from "react";
 import { JsonViewer } from '@textea/json-viewer'
 
@@ -35,6 +35,7 @@ export interface DerivedAuthenticationResponseInterface {
      * Response from the `getBasicUserInfo()` function from the SDK context.
      */
     authenticateResponse: BasicUserInfo;
+    tokenResponse: SessionData;
     /**
      * ID token split by `.`.
      */
@@ -47,6 +48,9 @@ export interface DerivedAuthenticationResponseInterface {
      * Decoded Payload of the ID Token.
      */
     decodedIDTokenPayload: Record<string, unknown>;
+    accessToken: string[];
+    decodedAccessTokenHeader: Record<string, unknown>;
+    decodedAccessTokenPayload: Record<string, unknown>;
 }
 
 /**
@@ -66,7 +70,7 @@ export const AuthenticationResponse: FunctionComponent<AuthenticationResponsePro
 
     return (
         <>
-            <h2>Authentication Response</h2>
+            {/* <h2>Authentication Response</h2>
             <h4 className="sub-title">
                 Derived by the&nbsp;
                 <code className="inline-code-block">
@@ -88,8 +92,31 @@ export const AuthenticationResponse: FunctionComponent<AuthenticationResponsePro
                     rootName={ false }
                     theme="dark"
                 />
+            </div> */}
+            <h2>Token Response</h2>
+            <h4 className="sub-title">
+                Derived by the&nbsp;
+                <code className="inline-code-block">
+                    <a href="https://www.npmjs.com/package/@asgardeo/auth-react/v/latest"
+                       target="_blank"
+                       rel="noreferrer"
+                    >
+                        @asgardeo/auth-react
+                    </a>
+                </code>&nbsp;SDK
+            </h4>
+            <div className="json">
+                <JsonViewer
+                    className="asg-json-viewer"
+                    value={ derivedResponse?.tokenResponse }
+                    enableClipboard={ false }
+                    displayObjectSize={ false }
+                    displayDataTypes={ false }
+                    rootName={ false }
+                    theme="dark"
+                />
             </div>
-            <h2 className="mb-0 mt-4">ID token</h2>
+            {/* <h2 className="mb-0 mt-4">ID token</h2>
             <div className="row">
                 { derivedResponse?.idToken && (
                     <div className="column">
@@ -128,6 +155,69 @@ export const AuthenticationResponse: FunctionComponent<AuthenticationResponsePro
                         <JsonViewer
                             className="asg-json-viewer"
                             value={ derivedResponse?.decodedIDTokenPayload }
+                            enableClipboard={ false }
+                            displayObjectSize={ false }
+                            displayDataTypes={ false }
+                            rootName={ false }
+                            theme="dark"
+                        />
+                    </div>
+                    <div className="json">
+                        <h5>Signature</h5>
+                        <div className="code">
+                            <code>
+                                HMACSHA256(
+                                <br/>
+                                &nbsp;&nbsp;<span className="id-token-0">base64UrlEncode(
+                                                <span className="id-token-1">header</span>)</span> + "." + <br/>
+                                &nbsp;&nbsp;<span className="id-token-0">base64UrlEncode(
+                                                <span className="id-token-1">payload</span>)</span>,&nbsp;
+                                <span className="id-token-1">your-256-bit-secret</span> <br/>
+                                );
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            </div> */}
+            <h2 className="mb-0 mt-4">Access token</h2>
+            <div className="row">
+                { derivedResponse?.accessToken && (
+                    <div className="column">
+                        <h5>
+                            <b>Encoded</b>
+                        </h5>
+                        <div className="code">
+                            <code>
+                                <span className="id-token-0">{ derivedResponse?.accessToken[0] }</span>.
+                                <span className="id-token-1">{ derivedResponse?.accessToken[1] }</span>.
+                                <span className="id-token-2">{ derivedResponse?.accessToken[2] }</span>
+                            </code>
+                        </div>
+                    </div>
+                ) }
+                <div className="column">
+                    <div className="json">
+                        <h5>
+                            <b>Decoded:</b> Header
+                        </h5>
+                        <JsonViewer
+                            className="asg-json-viewer"
+                            value={ derivedResponse?.decodedAccessTokenHeader }
+                            enableClipboard={ false }
+                            displayObjectSize={ false }
+                            displayDataTypes={ false }
+                            rootName={ false }
+                            theme="dark"
+                        />
+                    </div>
+
+                    <div className="json">
+                        <h5>
+                            <b>Decoded:</b> Payload
+                        </h5>
+                        <JsonViewer
+                            className="asg-json-viewer"
+                            value={ derivedResponse?.decodedAccessTokenPayload }
                             enableClipboard={ false }
                             displayObjectSize={ false }
                             displayDataTypes={ false }

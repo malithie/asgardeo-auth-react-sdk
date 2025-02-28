@@ -22,13 +22,16 @@ import {
     AuthSPAClientConfig,
     BasicUserInfo,
     Config,
+    CryptoHelper,
     CustomGrantConfig,
+    DataLayer,
     DecodedIDTokenPayload,
     FetchResponse,
     Hooks,
     HttpClientInstance,
     HttpRequestConfig,
     HttpResponse,
+    MainThreadClientConfig,
     OIDCEndpoints,
     SignInConfig
 } from "@asgardeo/auth-spa";
@@ -126,6 +129,8 @@ export interface AuthContextInterface {
     on(hook: Hooks, callback: (response?: any) => void, id?: string): void;
     state: AuthStateInterface;
     error: AsgardeoAuthException;
+    getCryptoHelper(): Promise<CryptoHelper>;
+    getDataLayer(): Promise<DataLayer<MainThreadClientConfig>>;
 }
 
 /**

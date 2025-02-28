@@ -28,7 +28,10 @@ import {
     HttpRequestConfig,
     HttpResponse,
     OIDCEndpoints,
-    SignInConfig
+    SignInConfig,
+    CryptoHelper,
+    DataLayer,
+    MainThreadClientConfig
 } from "@asgardeo/auth-spa";
 import { SPACustomGrantConfig } from "@asgardeo/auth-spa/src/models/request-custom-grant";
 import { AuthStateInterface } from "./models";
@@ -90,6 +93,7 @@ class AuthAPI {
             .signIn(config, authorizationCode, sessionState, authState, tokenRequestConfig)
             .then(async (response: BasicUserInfo) => {
                 if (!response) {
+                    console.log("No response received. ", response);
                     return;
                 }
 
@@ -366,6 +370,24 @@ class AuthAPI {
      */
     public async disableHttpHandler(): Promise<boolean> {
         return this._client.disableHttpHandler();
+    }
+
+    /**
+     * This method retrives the CryptoHelper.
+     *
+     * @return {Promise<CryptoHelper>} - A promise that resolves with True.
+     */
+    public async getCryptoHelper(): Promise<CryptoHelper> {
+        return this._client.getCryptoHelper();
+    }
+
+     /**
+     * This method retrives the DataLayer.
+     *
+     * @return {Promise<DataLayer<MainThreadClientConfig>>} - A promise that resolves with True.
+     */
+     public async getDataLayer(): Promise<DataLayer<MainThreadClientConfig>> {
+        return this._client.getDataLayer();
     }
 
     /**

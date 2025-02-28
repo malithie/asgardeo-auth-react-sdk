@@ -16,7 +16,7 @@
  * under the License.
  */
 
-import { BasicUserInfo, Hooks, useAuthContext } from "@asgardeo/auth-react";
+import { BasicUserInfo, Hooks, SessionData, useAuthContext } from "@asgardeo/auth-react";
 import React, { FunctionComponent, ReactElement, useCallback, useEffect, useState } from "react";
 import { default as authConfig } from "../config.json";
 import REACT_LOGO from "../images/react-logo.png";
@@ -28,9 +28,13 @@ import { USER_DENIED_LOGOUT } from "../constants/errors";
 
 interface DerivedState {
     authenticateResponse: BasicUserInfo,
+    tokenResponse: SessionData,
     idToken: string[],
     decodedIdTokenHeader: string,
     decodedIDTokenPayload: Record<string, string | number | boolean>;
+    accessToken: string[],
+    decodedAccessTokenHeader: string,
+    decodedAccessTokenPayload: Record<string, string | number | boolean>;
 }
 
 /**
@@ -49,6 +53,9 @@ export const HomePage: FunctionComponent = (): ReactElement => {
         getBasicUserInfo,
         getIDToken,
         getDecodedIDToken,
+        getAccessToken,
+        getCryptoHelper,
+        getDataLayer,
         on
     } = useAuthContext();
 
@@ -70,17 +77,24 @@ export const HomePage: FunctionComponent = (): ReactElement => {
             const basicUserInfo = await getBasicUserInfo();
             const idToken = await getIDToken();
             const decodedIDToken = await getDecodedIDToken();
+            const accessToken = await getAccessToken();
+            const decodedAccessToken = await (await getCryptoHelper()).decodeIDToken(accessToken);
+            const sessionData = await (await getDataLayer()).getSessionData();
 
             const derivedState: DerivedState = {
                 authenticateResponse: basicUserInfo,
+                tokenResponse: sessionData,
                 idToken: idToken.split("."),
                 decodedIdTokenHeader: JSON.parse(atob(idToken.split(".")[0])),
-                decodedIDTokenPayload: decodedIDToken
+                decodedIDTokenPayload: decodedIDToken,
+                accessToken: accessToken.split("."),
+                decodedAccessTokenHeader: JSON.parse(atob(accessToken.split(".")[0])),
+                decodedAccessTokenPayload: decodedAccessToken
             };
 
             setDerivedAuthenticationState(derivedState);
         })();
-    }, [ state.isAuthenticated , getBasicUserInfo, getIDToken, getDecodedIDToken ]);
+    }, [state?.isAuthenticated, getBasicUserInfo, getIDToken, getDecodedIDToken, getAccessToken, getCryptoHelper, getDataLayer]);
 
     useEffect(() => {
         if(stateParam && errorDescParam) {
@@ -92,8 +106,12 @@ export const HomePage: FunctionComponent = (): ReactElement => {
 
     const handleLogin = useCallback(() => {
         setHasLogoutFailureError(false);
+        console.log("Sign In");
         signIn()
-            .catch(() => setHasAuthenticationErrors(true));
+            .catch((error) => {
+            console.error("Login error: ", error);
+            setHasAuthenticationErrors(true);
+            });
     }, [ signIn ]);
 
    /**
@@ -142,9 +160,12 @@ export const HomePage: FunctionComponent = (): ReactElement => {
     }
 
     return (
+
+        console.log("state.isLoading", state.isLoading),
+        console.log("hasAuthenticationErrors", hasAuthenticationErrors),
         <DefaultLayout
             isLoading={ state.isLoading }
-            hasErrors={ hasAuthenticationErrors }
+            hasErrors={ hasAuthenticationErrors}
         >
             {
                 state.isAuthenticated
